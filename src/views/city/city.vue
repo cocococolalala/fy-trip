@@ -30,6 +30,7 @@
 <script setup>
  import { ref } from "vue";
  import { useRouter } from "vue-router";
+ import { getCityAll } from "@/services";
  const router = useRouter()
 
 
@@ -42,6 +43,10 @@ router.back()
 //tab切换的功能
 const tabActivate =ref()
 
+//网络请求:请求城市的数据
+getCityAll().then(res => {
+
+})
 
 </script>
 
