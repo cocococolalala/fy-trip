@@ -1,0 +1,17 @@
+:root {
+  --primary-color: #ff9854;
+
+  /* 全局修改: 任何地方只要用到-van-tabbar-item-icon-size都会被修改掉 */
+  /* --van-tabbar-item-icon-size: 30px !important; */
+  
+  /* 修改search样式 */
+  --van-search-left-icon-color: --van-tabs-bottom-bar-color
+}
+
+body {
+  font-size: 14px;
+  
+}
+
+
+
