@@ -7,14 +7,14 @@
    shape="round"
    show-action
    @cancel="cancelClick"
-   
    />
    
    
-    <van-tabs v-model:active="tabActivate"
-    color="#ff9854" >
-  <van-tab title="国内·港澳台"></van-tab>
-  <van-tab title="海外"></van-tab>
+<van-tabs v-model:active="tabActivate" color="#ff9854" >
+    <template v-for="(value,key,index) in allCity" :key="key">
+     <van-tab :title="value.title"></van-tab>
+    </template>
+ 
 </van-tabs>
  
    
@@ -41,11 +41,13 @@ router.back()
 }
 
 //tab切换的功能
-const tabActivate =ref()
+const tabActivate =ref({})
 
 //网络请求:请求城市的数据
+const allCity = ref()
 getCityAll().then(res => {
-
+     
+  allCity.value = res. data
 })
 
 </script>
