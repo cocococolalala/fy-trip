@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" ref="homeRef">
     <home-nav-bar/>
     <div class="banner">
       <img src="@/assets/img/home/banner.webp" alt="">
@@ -14,12 +14,16 @@
     <!-- <button @click="moreBtnClick">加载更多</button> -->
   
   </div>
-  <div/>
+ 
 </template>
 
+
+<script>
+export default  { name: "home" }
+</script>
+
 <script setup>
-import { watch } from 'vue';
-import { ref } from "vue";
+import { watch,ref } from 'vue';
 import useHomeStore from '@/stores/modules/home';
 import HomeNavBar from './cpns/home-nav-bar.vue'
 import searchBar from "@/components/search-bar/search-bar.vue";
@@ -43,8 +47,9 @@ homeStore.fetchHouseListData()
 
 
 //监听window窗口的滚动
+const homeRef = ref()
+const { isReachBottom,scrollTop } = useScroll(homeRef)
 
-const { isReachBottom,scrollTop } = useScroll()
 watch(isReachBottom,(newValue) => {
   if(newValue) {
     homeStore.fetchHouseListData().then(() => {
@@ -65,7 +70,11 @@ watch( scrollTop, (newTop) => {
 
 <style lang="less" scoped>
 .home {
-  padding-bottom: 100px;
+  padding-bottom: 60px;
+  height: 100vh;
+  overflow-y: auto ;
+  box-sizing: border-box;
+
 }
 
 .banner {

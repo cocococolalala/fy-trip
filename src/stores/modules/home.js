@@ -20,10 +20,12 @@ const useHomeStore = defineStore("home", {
       this.categories = res.data
     },
     async fetchHouseListData() {
-      const res = await getHomeHouseList(this.currentPage++)
+      const res = await getHomeHouseList(this.currentPage)
       this.houseList.push(...res.data)
+      this.currentPage++
       
     }
+   
 
   }
 })
