@@ -54,34 +54,30 @@
       </template>
     </div>
 
-    <!--搜索按钮-->
+    <!-- 搜索按钮 -->
     <div class="section search-btn">
       <div class="btn" @click="searchBtnClick">开始搜索</div>
     </div>
-
-
   </div>
 </template>
 
 <script setup>
 import useCityStore from '@/stores/modules/city';
-import useMainStore from '@/stores/modules/main';
 import { storeToRefs } from 'pinia';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import useHomeStore from "@/stores/modules/home"
 import { formatMonthDay, getDiffDays } from "@/utils/format_date"
+import useMainStore from '@/stores/modules/main';
+import { computed } from '@vue/reactivity';
 
 
 const router = useRouter()
-
-
 
 // 位置/城市
 const cityClick = () => {
   router.push("/city")
 }
-
 const positionClick = () => {
   navigator.geolocation.getCurrentPosition(res => {
     console.log("获取位置成功:", res)
@@ -99,11 +95,11 @@ const { currentCity } = storeToRefs(cityStore)
 
 // 日期范围的处理
 const mainStore = useMainStore()
-const {startDate , endDate} = storeToRefs(mainStore)
+const { startDate, endDate } = storeToRefs(mainStore)
 
 const startDateStr = computed(() => formatMonthDay(startDate.value))
 const endDateStr = computed(() => formatMonthDay(endDate.value))
-const stayCount = ref(getDiffDays(startDate.value, endDate.value)) 
+const stayCount = ref(getDiffDays(startDate.value, endDate.value))
 
 const showCalendar = ref(false)
 const onConfirm = (value) => {
@@ -113,6 +109,7 @@ const onConfirm = (value) => {
   mainStore.startDate = selectStartDate
   mainStore.endDate = selectEndDate
   stayCount.value = getDiffDays(selectStartDate, selectEndDate)
+
   // 2.隐藏日历
   showCalendar.value = false
 }
@@ -121,15 +118,15 @@ const onConfirm = (value) => {
 const homeStore = useHomeStore()
 const { hotSuggests } = storeToRefs(homeStore)
 
-//开始搜索
+// 开始搜索
 const searchBtnClick = () => {
   router.push({
     path: "/search",
     query: {
       startDate: startDate.value,
-      endDate:endDate.value,
-      currentCity:currentCity.value.cityName
-       }
+      endDate: endDate.value,
+      currentCity: currentCity.value.cityName
+    }
   })
 }
 
@@ -240,7 +237,10 @@ const searchBtnClick = () => {
 }
 
 .search-btn {
+  display: flex;
+    justify-content: center;
   .btn {
+    
     width: 342px;
     height: 38px;
     max-height: 50px;
@@ -253,4 +253,5 @@ const searchBtnClick = () => {
     background-image: var(--theme-linear-gradient);
   }
 }
+
 </style>
