@@ -24,7 +24,7 @@ const useHomeStore = defineStore("home", {
       this.houseList.push(...res.data)
       this.currentPage++
       
-    }
+    },
    
 
   }

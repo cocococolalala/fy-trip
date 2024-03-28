@@ -26,6 +26,7 @@ import { throttle } from 'underscore'
 // }
 
 export default function useScroll(elRef) {
+  
   let el = window
 
   const isReachBottom = ref(false)
@@ -43,7 +44,7 @@ export default function useScroll(elRef) {
     } else {
       clientHeight.value = el.clientHeight
       scrollTop.value = el.scrollTop
-      scrollHeight.value = el.scrollHeight
+      scrollHeight.value = el.scrollHeight - 1 // 防止出现误差不触发事件
     }
     if (clientHeight.value + scrollTop.value >= scrollHeight.value) {
       console.log("滚动到底部了")
