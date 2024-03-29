@@ -52,7 +52,7 @@
 <script setup>
 import useFavorStore from '@/stores/modules/favor';
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
+
 
 
 
@@ -60,10 +60,7 @@ const favorStore = useFavorStore()
 favorStore.fetchFavorListData()
 const { favorList } = storeToRefs(favorStore)
 
-const router = useRouter()
-const onClickLeft = () =>{
-  router.back()
-}
+
 
 </script>
 

@@ -55,12 +55,7 @@ router.back()
 //tab切换的功能
 const tabActivate =ref({})
 
-//网络请求:请求城市的数据
-// const allCity = ref()
-// getCityAll().then(res => {
-     
-//   allCity.value = res. data
-// })
+
 
 //从store中获取数据
 const cityStore = useCityStore()

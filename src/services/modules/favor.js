@@ -6,3 +6,8 @@ export function getFavorList(){
   })
 }
 
+export function getFavorHistory(){
+  return hyRequest.get({
+    url: "/favor/history"
+  })
+}
