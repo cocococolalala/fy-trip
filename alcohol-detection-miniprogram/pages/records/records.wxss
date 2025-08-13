@@ -1,0 +1,459 @@
+/* 页面头部 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  margin-bottom: var(--spacing-md);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--light-color);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+}
+
+.action-btn:active {
+  background: var(--border-color);
+}
+
+/* 统计概览 */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.stats-item {
+  text-align: center;
+}
+
+.stats-number {
+  font-size: 20px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stats-label {
+  font-size: 12px;
+  color: var(--text-light-color);
+  display: block;
+}
+
+/* 筛选区域 */
+.filter-section {
+  margin-bottom: var(--spacing-md);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.filter-section.show {
+  opacity: 1;
+  max-height: 300px;
+}
+
+.filter-content {
+  padding: var(--spacing-md);
+}
+
+.filter-row {
+  margin-bottom: var(--spacing-md);
+}
+
+.filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.filter-options {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.filter-option {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--border-color);
+  background: white;
+  color: var(--text-color);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.filter-option.active {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+}
+
+.date-picker-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.date-picker {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: white;
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.date-separator {
+  color: var(--text-light-color);
+  font-size: 14px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+}
+
+/* 记录区域 */
+.records-section {
+  flex: 1;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  padding: 0 var(--spacing-xs);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.sort-options {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.sort-btn {
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-light-color);
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.sort-btn.active {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+}
+
+/* 记录卡片 */
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.record-card {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.record-card:active {
+  transform: scale(0.98);
+}
+
+.record-header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.record-info {
+  flex: 1;
+}
+
+.record-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 2px;
+}
+
+.record-location {
+  font-size: 14px;
+}
+
+.record-result {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.record-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.expand-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light-color);
+  transition: transform 0.3s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+/* 记录详情 */
+.record-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.record-detail.show {
+  max-height: 1000px;
+}
+
+.detail-section {
+  padding: 0 var(--spacing-md) var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.detail-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: var(--spacing-md) 0 var(--spacing-sm);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: var(--text-light-color);
+}
+
+.detail-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* 检测记录时间轴 */
+.test-records {
+  padding: 0 var(--spacing-md) var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.test-timeline {
+  position: relative;
+  padding-left: var(--spacing-md);
+}
+
+.test-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.timeline-item {
+  position: relative;
+  padding: var(--spacing-sm) 0;
+  padding-left: var(--spacing-md);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid white;
+  z-index: 1;
+}
+
+.timeline-dot.primary {
+  background: var(--primary-color);
+}
+
+.timeline-dot.success {
+  background: var(--success-color);
+}
+
+.timeline-dot.danger {
+  background: var(--danger-color);
+}
+
+.timeline-content {
+  background: var(--background-color);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+}
+
+.timeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 2px;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: var(--text-light-color);
+  margin-bottom: 4px;
+}
+
+.timeline-result {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 记录操作 */
+.record-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.record-actions .btn {
+  flex: 1;
+  min-width: 80px;
+  font-size: 12px;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-lg) var(--spacing-md);
+  color: var(--text-light-color);
+}
+
+.empty-icon {
+  margin-bottom: var(--spacing-md);
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.empty-subtitle {
+  font-size: 14px;
+  display: block;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* 加载更多 */
+.load-more {
+  padding: var(--spacing-lg) 0;
+  text-align: center;
+}
+
+/* 动画 */
+.slide-up:nth-child(1) { animation-delay: 0.1s; }
+.slide-up:nth-child(2) { animation-delay: 0.15s; }
+.slide-up:nth-child(3) { animation-delay: 0.2s; }
+.slide-up:nth-child(4) { animation-delay: 0.25s; }
+.slide-up:nth-child(5) { animation-delay: 0.3s; }
+
+/* 响应式适配 */
+@media (max-width: 375px) {
+  .stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xs);
+  }
+  
+  .stats-number {
+    font-size: 18px;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xs);
+  }
+  
+  .record-actions {
+    flex-direction: column;
+  }
+  
+  .record-actions .btn {
+    flex: none;
+    width: 100%;
+  }
+  
+  .date-picker-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .date-separator {
+    text-align: center;
+    padding: var(--spacing-xs) 0;
+  }
+}

@@ -1,0 +1,170 @@
+<view class="detection-container">
+  <!-- 摄像头预览区域 -->
+  <view class="camera-section">
+    <camera 
+      class="camera-preview"
+      device-position="{{cameraPosition}}"
+      flash="{{flashMode}}"
+      binderror="onCameraError"
+      bindstop="onCameraStop"
+      bindinitialized="onCameraReady">
+    </camera>
+    
+    <!-- 摄像头控制覆盖层 -->
+    <view class="camera-overlay">
+      <!-- 检测状态指示器 -->
+      <view class="detection-status {{isDetecting ? 'detecting' : ''}}">
+        <view class="status-ring">
+          <view class="status-dot"></view>
+        </view>
+        <text class="status-text">
+          {{isDetecting ? '检测中...' : (isReady ? '准备就绪' : '准备中...')}}
+        </text>
+      </view>
+      
+      <!-- 检测框 -->
+      <view class="detection-frame {{isDetecting ? 'active' : ''}}">
+        <view class="frame-corner top-left"></view>
+        <view class="frame-corner top-right"></view>
+        <view class="frame-corner bottom-left"></view>
+        <view class="frame-corner bottom-right"></view>
+        <text class="frame-hint">请保持设备稳定，对准检测区域</text>
+      </view>
+      
+      <!-- 摄像头切换按钮 -->
+      <view class="camera-controls">
+        <button class="control-btn" bindtap="switchCamera">
+          <text class="icon icon-md">🔄</text>
+        </button>
+        <button class="control-btn" bindtap="toggleFlash">
+          <text class="icon icon-md">{{flashMode === 'on' ? '🔦' : '💡'}}</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 实时数据显示区域 -->
+  <view class="data-section">
+    <!-- 当前检测值 -->
+    <view class="current-value-card card">
+      <view class="value-display">
+        <text class="value-number {{currentValue >= 0.2 ? 'danger' : (currentValue >= 0.05 ? 'warning' : 'normal')}}">
+          {{currentValue.toFixed(3)}}
+        </text>
+        <text class="value-unit">mg/100ml</text>
+      </view>
+      <view class="value-status">
+        <view class="status-badge {{currentValue >= 0.2 ? 'status-danger' : (currentValue >= 0.05 ? 'status-warning' : 'status-normal')}}">
+          <text class="icon icon-sm">
+            {{currentValue >= 0.2 ? '⚠' : (currentValue >= 0.05 ? '⚠' : '✓')}}
+          </text>
+          {{currentValue >= 0.2 ? '异常' : (currentValue >= 0.05 ? '警告' : '正常')}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 检测环境信息 -->
+    <view class="environment-info">
+      <view class="info-item">
+        <text class="info-label">环境温度</text>
+        <text class="info-value">{{temperature}}°C</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">湿度</text>
+        <text class="info-value">{{humidity}}%</text>
+      </view>
+      <view class="info-item">
+        <text class="info-label">检测时长</text>
+        <text class="info-value">{{formatTime(detectionTime)}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 控制按钮区域 -->
+  <view class="control-section safe-area">
+    <!-- 检测进度 -->
+    <view class="progress-container" wx:if="{{isDetecting}}">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{detectionProgress}}%"></view>
+      </view>
+      <text class="progress-text">检测进度 {{detectionProgress}}%</text>
+    </view>
+
+    <!-- 主要控制按钮 -->
+    <view class="main-controls">
+      <button 
+        class="btn btn-large {{isDetecting ? 'btn-danger' : 'btn-primary'}} detection-btn"
+        bindtap="{{isDetecting ? 'stopDetection' : 'startDetection'}}"
+        disabled="{{!isReady && !isDetecting}}">
+        <text class="icon icon-lg">{{isDetecting ? '⏹' : '▶'}}</text>
+        {{isDetecting ? '停止检测' : '开始检测'}}
+      </button>
+    </view>
+
+    <!-- 次要控制按钮 -->
+    <view class="secondary-controls">
+      <button class="btn btn-outline" bindtap="resetDetection" disabled="{{isDetecting}}">
+        <text class="icon icon-md">🔄</text>
+        重置
+      </button>
+      <button class="btn btn-outline" bindtap="saveRecord" disabled="{{!hasResult}}">
+        <text class="icon icon-md">💾</text>
+        保存记录
+      </button>
+      <button class="btn btn-outline" bindtap="viewHistory">
+        <text class="icon icon-md">📋</text>
+        查看记录
+      </button>
+    </view>
+  </view>
+
+  <!-- 检测结果弹窗 -->
+  <view class="result-modal {{showResult ? 'show' : ''}}" catchtouchmove="preventTouchMove">
+    <view class="modal-backdrop" bindtap="closeResult"></view>
+    <view class="modal-content slide-up">
+      <view class="modal-header">
+        <text class="modal-title">检测完成</text>
+        <button class="modal-close" bindtap="closeResult">×</button>
+      </view>
+      <view class="modal-body">
+        <view class="result-display">
+          <view class="result-icon {{resultData.status === 'normal' ? 'success' : 'danger'}}">
+            <text class="icon icon-xl">{{resultData.status === 'normal' ? '✓' : '⚠'}}</text>
+          </view>
+          <view class="result-value">
+            <text class="result-number {{resultData.status === 'normal' ? 'text-success' : 'text-danger'}}">
+              {{resultData.value}}
+            </text>
+            <text class="result-unit">mg/100ml</text>
+          </view>
+          <view class="result-status">
+            <text class="result-label {{resultData.status === 'normal' ? 'text-success' : 'text-danger'}}">
+              {{resultData.status === 'normal' ? '检测正常' : '检测异常'}}
+            </text>
+          </view>
+        </view>
+        <view class="result-details">
+          <view class="detail-item">
+            <text class="detail-label">检测时间</text>
+            <text class="detail-value">{{resultData.time}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">检测地点</text>
+            <text class="detail-value">{{resultData.location}}</text>
+          </view>
+          <view class="detail-item">
+            <text class="detail-label">环境温度</text>
+            <text class="detail-value">{{resultData.temperature}}°C</text>
+          </view>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-outline" bindtap="closeResult">关闭</button>
+        <button class="btn btn-primary" bindtap="saveAndClose">保存记录</button>
+        <button class="btn btn-warning" bindtap="retestNow" wx:if="{{resultData.status !== 'normal'}}">
+          立即复检
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

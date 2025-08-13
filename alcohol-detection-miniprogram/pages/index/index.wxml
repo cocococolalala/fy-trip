@@ -1,0 +1,112 @@
+<view class="container safe-area">
+  <!-- 顶部状态卡片 -->
+  <view class="status-card card fade-in">
+    <view class="status-header">
+      <view class="status-icon">
+        <text class="icon icon-xl {{lastDetection.status === 'normal' ? 'text-success' : 'text-danger'}}">
+          {{lastDetection.status === 'normal' ? '✓' : '⚠'}}
+        </text>
+      </view>
+      <view class="status-content">
+        <text class="status-title">{{lastDetection.status === 'normal' ? '检测正常' : '检测异常'}}</text>
+        <text class="status-subtitle text-light">上次检测时间：{{lastDetection.time}}</text>
+      </view>
+      <view class="status-value">
+        <text class="alcohol-value {{lastDetection.status === 'normal' ? 'text-success' : 'text-danger'}}">
+          {{lastDetection.value}}
+        </text>
+        <text class="alcohol-unit text-light">mg/100ml</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 异常提醒卡片 -->
+  <view class="alert-card card slide-up" wx:if="{{hasAbnormalRecord}}">
+    <view class="alert-content">
+      <view class="alert-icon">
+        <text class="icon icon-md text-warning">⚠</text>
+      </view>
+      <view class="alert-text">
+        <text class="alert-title">发现异常检测记录</text>
+        <text class="alert-subtitle text-light">{{abnormalRecord.time}} 检测值异常，建议进行复检</text>
+      </view>
+      <view class="alert-action">
+        <button class="btn btn-warning btn-small" bindtap="goToRecords">查看详情</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速操作区域 -->
+  <view class="quick-actions">
+    <button class="btn btn-primary btn-large start-detection-btn slide-up" bindtap="startDetection">
+      <text class="icon icon-lg">🔍</text>
+      开始酒精检测
+    </button>
+  </view>
+
+  <!-- 最近检测数据 -->
+  <view class="recent-section">
+    <view class="section-header">
+      <text class="section-title">最近检测</text>
+      <text class="section-action text-primary" bindtap="goToRecords">查看全部 →</text>
+    </view>
+    
+    <view class="recent-list">
+      <view class="recent-item card slide-up" 
+            wx:for="{{recentRecords}}" 
+            wx:key="id"
+            bindtap="goToRecordDetail"
+            data-id="{{item.id}}">
+        <view class="recent-content">
+          <view class="recent-info">
+            <view class="recent-time">{{item.date}}</view>
+            <view class="recent-location text-light">{{item.location}}</view>
+          </view>
+          <view class="recent-result">
+            <view class="recent-value {{item.status === 'normal' ? 'text-success' : 'text-danger'}}">
+              {{item.value}} mg/100ml
+            </view>
+            <view class="status-badge {{item.status === 'normal' ? 'status-normal' : 'status-danger'}}">
+              <text class="icon icon-sm">{{item.status === 'normal' ? '✓' : '⚠'}}</text>
+              {{item.status === 'normal' ? '正常' : '异常'}}
+            </view>
+          </view>
+        </view>
+        <view class="recent-actions" wx:if="{{item.status !== 'normal'}}">
+          <button class="btn btn-outline btn-small" 
+                  bindtap="retest" 
+                  data-id="{{item.id}}"
+                  catchtap="true">
+            复检
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计信息 -->
+  <view class="stats-section">
+    <view class="section-header">
+      <text class="section-title">检测统计</text>
+    </view>
+    
+    <view class="stats-grid">
+      <view class="stats-item card">
+        <view class="stats-value text-primary">{{stats.total}}</view>
+        <view class="stats-label text-light">总检测次数</view>
+      </view>
+      <view class="stats-item card">
+        <view class="stats-value text-success">{{stats.normal}}</view>
+        <view class="stats-label text-light">正常次数</view>
+      </view>
+      <view class="stats-item card">
+        <view class="stats-value text-danger">{{stats.abnormal}}</view>
+        <view class="stats-label text-light">异常次数</view>
+      </view>
+      <view class="stats-item card">
+        <view class="stats-value text-warning">{{stats.retest}}</view>
+        <view class="stats-label text-light">复检次数</view>
+      </view>
+    </view>
+  </view>
+</view>
