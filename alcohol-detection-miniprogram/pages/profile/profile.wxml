@@ -1,0 +1,250 @@
+<view class="container safe-area">
+  <!-- 用户信息卡片 -->
+  <view class="profile-header card">
+    <view class="avatar-section" bindtap="changeAvatar">
+      <image class="user-avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="avatar-badge">
+        <text class="icon icon-sm">📷</text>
+      </view>
+    </view>
+    <view class="user-info">
+      <view class="user-name">{{userInfo.name || '用户'}}</view>
+      <view class="user-id text-light">ID: {{userInfo.id || 'N/A'}}</view>
+      <view class="user-level">
+        <text class="level-badge {{userInfo.level || 'normal'}}">
+          {{userInfo.levelText || '普通用户'}}
+        </text>
+      </view>
+    </view>
+    <view class="profile-actions">
+      <button class="action-btn" bindtap="editProfile">
+        <text class="icon icon-md">✏️</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-section">
+    <view class="section-title">使用统计</view>
+    <view class="stats-grid">
+      <view class="stats-card card" bindtap="viewRecords">
+        <view class="stats-icon">
+          <text class="icon icon-lg text-primary">📊</text>
+        </view>
+        <view class="stats-content">
+          <view class="stats-number">{{userStats.totalTests}}</view>
+          <view class="stats-label">总检测次数</view>
+        </view>
+      </view>
+      <view class="stats-card card" bindtap="viewRecords">
+        <view class="stats-icon">
+          <text class="icon icon-lg text-success">✅</text>
+        </view>
+        <view class="stats-content">
+          <view class="stats-number">{{userStats.normalTests}}</view>
+          <view class="stats-label">正常检测</view>
+        </view>
+      </view>
+      <view class="stats-card card" bindtap="viewAbnormalRecords">
+        <view class="stats-icon">
+          <text class="icon icon-lg text-danger">⚠️</text>
+        </view>
+        <view class="stats-content">
+          <view class="stats-number">{{userStats.abnormalTests}}</view>
+          <view class="stats-label">异常检测</view>
+        </view>
+      </view>
+      <view class="stats-card card">
+        <view class="stats-icon">
+          <text class="icon icon-lg text-info">📅</text>
+        </view>
+        <view class="stats-content">
+          <view class="stats-number">{{userStats.continuousDays}}</view>
+          <view class="stats-label">连续使用天数</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷功能 -->
+  <view class="quick-functions">
+    <view class="section-title">快捷功能</view>
+    <view class="function-list">
+      <view class="function-item card" bindtap="startDetection">
+        <view class="function-icon">
+          <text class="icon icon-lg">🔍</text>
+        </view>
+        <view class="function-content">
+          <view class="function-title">开始检测</view>
+          <view class="function-subtitle text-light">进行酒精浓度检测</view>
+        </view>
+        <view class="function-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+      
+      <view class="function-item card" bindtap="viewRecords">
+        <view class="function-icon">
+          <text class="icon icon-lg">📋</text>
+        </view>
+        <view class="function-content">
+          <view class="function-title">检测记录</view>
+          <view class="function-subtitle text-light">查看历史检测记录</view>
+        </view>
+        <view class="function-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+
+      <view class="function-item card" bindtap="exportData">
+        <view class="function-icon">
+          <text class="icon icon-lg">📤</text>
+        </view>
+        <view class="function-content">
+          <view class="function-title">数据导出</view>
+          <view class="function-subtitle text-light">导出检测数据报告</view>
+        </view>
+        <view class="function-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 设置选项 -->
+  <view class="settings-section">
+    <view class="section-title">设置</view>
+    <view class="settings-list">
+      <view class="setting-item card" bindtap="deviceSettings">
+        <view class="setting-icon">
+          <text class="icon icon-md">📱</text>
+        </view>
+        <view class="setting-content">
+          <view class="setting-title">设备设置</view>
+          <view class="setting-subtitle text-light">检测设备配置管理</view>
+        </view>
+        <view class="setting-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+
+      <view class="setting-item card" bindtap="notificationSettings">
+        <view class="setting-icon">
+          <text class="icon icon-md">🔔</text>
+        </view>
+        <view class="setting-content">
+          <view class="setting-title">通知设置</view>
+          <view class="setting-subtitle text-light">管理提醒和通知</view>
+        </view>
+        <view class="setting-value">
+          <switch checked="{{settings.notifications}}" bindchange="toggleNotifications" color="#3cc51f"></switch>
+        </view>
+      </view>
+
+      <view class="setting-item card" bindtap="privacySettings">
+        <view class="setting-icon">
+          <text class="icon icon-md">🔒</text>
+        </view>
+        <view class="setting-content">
+          <view class="setting-title">隐私设置</view>
+          <view class="setting-subtitle text-light">数据隐私和安全</view>
+        </view>
+        <view class="setting-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+
+      <view class="setting-item card" bindtap="dataManagement">
+        <view class="setting-icon">
+          <text class="icon icon-md">💾</text>
+        </view>
+        <view class="setting-content">
+          <view class="setting-title">数据管理</view>
+          <view class="setting-subtitle text-light">清理缓存和数据备份</view>
+        </view>
+        <view class="setting-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 帮助和支持 -->
+  <view class="help-section">
+    <view class="section-title">帮助与支持</view>
+    <view class="help-list">
+      <view class="help-item card" bindtap="viewHelp">
+        <view class="help-icon">
+          <text class="icon icon-md">❓</text>
+        </view>
+        <view class="help-content">
+          <view class="help-title">使用帮助</view>
+        </view>
+        <view class="help-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+
+      <view class="help-item card" bindtap="feedback">
+        <view class="help-icon">
+          <text class="icon icon-md">💬</text>
+        </view>
+        <view class="help-content">
+          <view class="help-title">意见反馈</view>
+        </view>
+        <view class="help-arrow">
+          <text class="icon icon-sm text-light">></text>
+        </view>
+      </view>
+
+      <view class="help-item card" bindtap="aboutApp">
+        <view class="help-icon">
+          <text class="icon icon-md">ℹ️</text>
+        </view>
+        <view class="help-content">
+          <view class="help-title">关于应用</view>
+        </view>
+        <view class="help-value text-light">
+          v{{appVersion}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section">
+    <button class="btn btn-outline logout-btn" bindtap="logout">
+      <text class="icon icon-md">🚪</text>
+      退出登录
+    </button>
+  </view>
+</view>
+
+<!-- 编辑资料弹窗 -->
+<view class="edit-modal {{showEditModal ? 'show' : ''}}" catchtouchmove="preventTouchMove">
+  <view class="modal-backdrop" bindtap="closeEditModal"></view>
+  <view class="modal-content slide-up">
+    <view class="modal-header">
+      <text class="modal-title">编辑资料</text>
+      <button class="modal-close" bindtap="closeEditModal">×</button>
+    </view>
+    <view class="modal-body">
+      <view class="form-group">
+        <text class="form-label">姓名</text>
+        <input class="form-input" placeholder="请输入姓名" value="{{editForm.name}}" bindinput="onNameInput" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">手机号</text>
+        <input class="form-input" placeholder="请输入手机号" value="{{editForm.phone}}" bindinput="onPhoneInput" type="number" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">邮箱</text>
+        <input class="form-input" placeholder="请输入邮箱" value="{{editForm.email}}" bindinput="onEmailInput" />
+      </view>
+    </view>
+    <view class="modal-footer">
+      <button class="btn btn-outline" bindtap="closeEditModal">取消</button>
+      <button class="btn btn-primary" bindtap="saveProfile">保存</button>
+    </view>
+  </view>
+</view>

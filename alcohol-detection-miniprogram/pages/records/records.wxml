@@ -1,0 +1,215 @@
+<view class="container safe-area">
+  <!-- 页面头部 -->
+  <view class="page-header">
+    <text class="page-title">检测记录</text>
+    <view class="header-actions">
+      <button class="action-btn" bindtap="showFilter">
+        <text class="icon icon-md">🔍</text>
+      </button>
+      <button class="action-btn" bindtap="exportRecords">
+        <text class="icon icon-md">📤</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 统计概览 -->
+  <view class="stats-overview card">
+    <view class="stats-item">
+      <text class="stats-number text-primary">{{totalRecords}}</text>
+      <text class="stats-label">总记录</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number text-success">{{normalCount}}</text>
+      <text class="stats-label">正常</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number text-danger">{{abnormalCount}}</text>
+      <text class="stats-label">异常</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number text-warning">{{retestCount}}</text>
+      <text class="stats-label">复检</text>
+    </view>
+  </view>
+
+  <!-- 筛选条件 -->
+  <view class="filter-section {{showFilterPanel ? 'show' : ''}}" wx:if="{{showFilterPanel}}">
+    <view class="filter-content card">
+      <view class="filter-row">
+        <text class="filter-label">状态筛选</text>
+        <view class="filter-options">
+          <button class="filter-option {{filterStatus === 'all' ? 'active' : ''}}" 
+                  data-status="all" bindtap="setFilterStatus">全部</button>
+          <button class="filter-option {{filterStatus === 'normal' ? 'active' : ''}}" 
+                  data-status="normal" bindtap="setFilterStatus">正常</button>
+          <button class="filter-option {{filterStatus === 'abnormal' ? 'active' : ''}}" 
+                  data-status="abnormal" bindtap="setFilterStatus">异常</button>
+        </view>
+      </view>
+      <view class="filter-row">
+        <text class="filter-label">时间范围</text>
+        <view class="date-picker-group">
+          <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+            <view class="date-picker">{{startDate || '开始日期'}}</view>
+          </picker>
+          <text class="date-separator">至</text>
+          <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+            <view class="date-picker">{{endDate || '结束日期'}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="filter-actions">
+        <button class="btn btn-outline btn-small" bindtap="resetFilter">重置</button>
+        <button class="btn btn-primary btn-small" bindtap="applyFilter">应用筛选</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 记录列表 -->
+  <view class="records-section">
+    <view class="section-header" wx:if="{{filteredRecords.length > 0}}">
+      <text class="section-title">{{filteredRecords.length}} 条记录</text>
+      <view class="sort-options">
+        <button class="sort-btn {{sortBy === 'time' ? 'active' : ''}}" 
+                data-sort="time" bindtap="setSortBy">时间</button>
+        <button class="sort-btn {{sortBy === 'value' ? 'active' : ''}}" 
+                data-sort="value" bindtap="setSortBy">数值</button>
+      </view>
+    </view>
+
+    <!-- 记录卡片列表 -->
+    <view class="records-list">
+      <view class="record-card card slide-up" 
+            wx:for="{{filteredRecords}}" 
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="toggleRecordDetail">
+        <!-- 基本信息 -->
+        <view class="record-header">
+          <view class="record-info">
+            <view class="record-time">{{item.time}}</view>
+            <view class="record-location text-light">{{item.location}}</view>
+          </view>
+          <view class="record-result">
+            <view class="record-value {{item.status === 'normal' ? 'text-success' : 'text-danger'}}">
+              {{item.value}} mg/100ml
+            </view>
+            <view class="status-badge {{item.status === 'normal' ? 'status-normal' : 'status-danger'}}">
+              <text class="icon icon-sm">{{item.status === 'normal' ? '✓' : '⚠'}}</text>
+              {{item.status === 'normal' ? '正常' : '异常'}}
+            </view>
+          </view>
+          <view class="expand-icon {{item.expanded ? 'expanded' : ''}}">
+            <text class="icon icon-sm">▼</text>
+          </view>
+        </view>
+
+        <!-- 展开的详细信息 -->
+        <view class="record-detail {{item.expanded ? 'show' : ''}}" wx:if="{{item.expanded}}">
+          <view class="detail-section">
+            <view class="detail-title">检测详情</view>
+            <view class="detail-grid">
+              <view class="detail-item">
+                <text class="detail-label">检测时长</text>
+                <text class="detail-value">{{item.duration}}秒</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">环境温度</text>
+                <text class="detail-value">{{item.temperature}}°C</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">湿度</text>
+                <text class="detail-value">{{item.humidity}}%</text>
+              </view>
+              <view class="detail-item">
+                <text class="detail-label">设备编号</text>
+                <text class="detail-value">{{item.deviceId || 'N/A'}}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 首检和复检记录 -->
+          <view class="test-records" wx:if="{{item.retests && item.retests.length > 0}}">
+            <view class="detail-title">检测记录</view>
+            <view class="test-timeline">
+              <view class="timeline-item">
+                <view class="timeline-dot primary"></view>
+                <view class="timeline-content">
+                  <view class="timeline-title">首次检测</view>
+                  <view class="timeline-time">{{item.time}}</view>
+                  <view class="timeline-result {{item.status === 'normal' ? 'text-success' : 'text-danger'}}">
+                    {{item.value}} mg/100ml
+                  </view>
+                </view>
+              </view>
+              <view class="timeline-item" wx:for="{{item.retests}}" wx:key="index" wx:for-item="retest">
+                <view class="timeline-dot {{retest.status === 'normal' ? 'success' : 'danger'}}"></view>
+                <view class="timeline-content">
+                  <view class="timeline-title">复检 {{index + 1}}</view>
+                  <view class="timeline-time">{{retest.time}}</view>
+                  <view class="timeline-result {{retest.status === 'normal' ? 'text-success' : 'text-danger'}}">
+                    {{retest.value}} mg/100ml
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 操作按钮 -->
+          <view class="record-actions">
+            <button class="btn btn-outline btn-small" 
+                    bindtap="viewVideo" 
+                    data-id="{{item.id}}"
+                    catchtap="true"
+                    wx:if="{{item.videoPath}}">
+              <text class="icon icon-sm">📹</text>
+              查看视频
+            </button>
+            <button class="btn btn-outline btn-small" 
+                    bindtap="shareRecord" 
+                    data-id="{{item.id}}"
+                    catchtap="true">
+              <text class="icon icon-sm">📤</text>
+              分享
+            </button>
+            <button class="btn btn-warning btn-small" 
+                    bindtap="retestRecord" 
+                    data-id="{{item.id}}"
+                    catchtap="true"
+                    wx:if="{{item.status !== 'normal'}}">
+              <text class="icon icon-sm">🔄</text>
+              复检
+            </button>
+            <button class="btn btn-danger btn-small" 
+                    bindtap="deleteRecord" 
+                    data-id="{{item.id}}"
+                    catchtap="true">
+              <text class="icon icon-sm">🗑</text>
+              删除
+            </button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{filteredRecords.length === 0}}">
+      <view class="empty-icon">
+        <text class="icon icon-xl">📋</text>
+      </view>
+      <text class="empty-title">暂无检测记录</text>
+      <text class="empty-subtitle">开始您的第一次酒精检测吧</text>
+      <button class="btn btn-primary" bindtap="startDetection">
+        <text class="icon icon-md">🔍</text>
+        开始检测
+      </button>
+    </view>
+  </view>
+
+  <!-- 加载更多 -->
+  <view class="load-more" wx:if="{{hasMore && filteredRecords.length > 0}}">
+    <button class="btn btn-outline" bindtap="loadMore" loading="{{loading}}">
+      {{loading ? '加载中...' : '加载更多'}}
+    </button>
+  </view>
+</view>

@@ -1,0 +1,267 @@
+/* 状态卡片 */
+.status-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  margin-bottom: var(--spacing-md);
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.status-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.status-content {
+  flex: 1;
+}
+
+.status-title {
+  font-size: 18px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.status-subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+  display: block;
+}
+
+.status-value {
+  text-align: right;
+}
+
+.alcohol-value {
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
+  color: white;
+}
+
+.alcohol-unit {
+  font-size: 12px;
+  opacity: 0.8;
+  display: block;
+}
+
+/* 异常提醒卡片 */
+.alert-card {
+  background: #fff3cd;
+  border-left: 4px solid var(--warning-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm);
+  gap: var(--spacing-sm);
+}
+
+.alert-icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(243, 156, 18, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-text {
+  flex: 1;
+}
+
+.alert-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #856404;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.alert-subtitle {
+  font-size: 14px;
+  display: block;
+}
+
+/* 快速操作区域 */
+.quick-actions {
+  margin: var(--spacing-lg) 0;
+}
+
+.start-detection-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  animation-delay: 0.2s;
+}
+
+.start-detection-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+/* 最近检测区域 */
+.recent-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  padding: 0 var(--spacing-xs);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.section-action {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.recent-item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.recent-item:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.recent-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm);
+}
+
+.recent-info {
+  flex: 1;
+}
+
+.recent-time {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 2px;
+}
+
+.recent-location {
+  font-size: 14px;
+}
+
+.recent-result {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.recent-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.recent-actions {
+  padding: 0 var(--spacing-sm) var(--spacing-sm);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 统计信息 */
+.stats-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.stats-item {
+  text-align: center;
+  padding: var(--spacing-md);
+  transition: transform 0.2s ease;
+}
+
+.stats-item:active {
+  transform: scale(0.95);
+}
+
+.stats-value {
+  font-size: 24px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stats-label {
+  font-size: 14px;
+  display: block;
+}
+
+/* 动画延迟 */
+.slide-up:nth-child(1) { animation-delay: 0.1s; }
+.slide-up:nth-child(2) { animation-delay: 0.2s; }
+.slide-up:nth-child(3) { animation-delay: 0.3s; }
+.slide-up:nth-child(4) { animation-delay: 0.4s; }
+
+/* 响应式适配 */
+@media (max-width: 375px) {
+  .status-header {
+    padding: var(--spacing-sm);
+  }
+  
+  .status-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .alcohol-value {
+    font-size: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xs);
+  }
+  
+  .stats-item {
+    padding: var(--spacing-sm);
+  }
+  
+  .stats-value {
+    font-size: 20px;
+  }
+}
