@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>苍河酒精检测小程序原型</title>
+    
+    <!-- Vant UI 组件库 -->
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4/lib/index.css" />
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #f7f8fa;
+            overflow-x: hidden;
+        }
+
+        /* 手机容器样式 */
+        .phone-container {
+            max-width: 375px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-header {
+            height: 44px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 页面容器 */
+        .page {
+            display: none;
+            min-height: calc(100vh - 150px);
+            background: #f7f8fa;
+            position: relative;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            height: 46px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .back-btn {
+            color: #1989fa;
+            font-size: 16px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .navbar .title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            height: 50px;
+            background: white;
+            border-top: 1px solid #ebedf0;
+            display: flex;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #969799;
+            font-size: 10px;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: #1989fa;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        /* 首页样式 */
+        .home-header {
+            background: linear-gradient(135deg, #1989fa, #1890ff);
+            padding: 20px 16px 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .home-header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .home-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .home-content {
+            padding: 0 16px 60px;
+            margin-top: -20px;
+        }
+
+        .detection-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+        }
+
+        .start-detection-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #07c160, #06ad56);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0 auto 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(7, 193, 96, 0.3);
+            transition: all 0.3s;
+        }
+
+        .start-detection-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(7, 193, 96, 0.4);
+        }
+
+        .start-detection-btn i {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .info-cards {
+            display: flex;
+            gap: 12px;
+        }
+
+        .info-card {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .info-card.warning {
+            border-left: 4px solid #ff976a;
+        }
+
+        .info-card.normal {
+            border-left: 4px solid #07c160;
+        }
+
+        .info-card .icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .info-card.warning .icon {
+            color: #ff976a;
+        }
+
+        .info-card.normal .icon {
+            color: #07c160;
+        }
+
+        .info-card .title {
+            font-size: 12px;
+            color: #646566;
+            margin-bottom: 4px;
+        }
+
+        .info-card .value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+        }
+
+        .info-card .desc {
+            font-size: 11px;
+            color: #969799;
+            margin-top: 4px;
+        }
+
+        /* 检测页面样式 */
+        .detection-container {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .detection-status {
+            background: white;
+            border-radius: 12px;
+            padding: 40px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .detection-animation {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            position: relative;
+        }
+
+        .detection-animation.preparing {
+            background: linear-gradient(135deg, #1989fa, #1890ff);
+        }
+
+        .detection-animation.detecting {
+            background: linear-gradient(135deg, #ff976a, #ff8f4c);
+            animation: pulse 2s infinite;
+        }
+
+        .detection-animation.success {
+            background: linear-gradient(135deg, #07c160, #06ad56);
+        }
+
+        .detection-animation.danger {
+            background: linear-gradient(135deg, #ee0a24, #d60021);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .detection-text h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #323233;
+        }
+
+        .detection-text p {
+            color: #646566;
+            font-size: 14px;
+        }
+
+        .detection-result {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ebedf0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #646566;
+            font-size: 14px;
+        }
+
+        .result-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #323233;
+        }
+
+        .result-value.danger {
+            color: #ee0a24;
+        }
+
+        .result-value.success {
+            color: #07c160;
+        }
+
+        /* 检测记录页面 */
+        .records-container {
+            padding: 16px;
+            padding-bottom: 60px;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+        }
+
+        .search-bar i {
+            color: #969799;
+            margin-right: 8px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #323233;
+        }
+
+        .record-card {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .record-header {
+            padding: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-time {
+            font-size: 14px;
+            color: #323233;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .record-status {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .record-status.normal {
+            color: #07c160;
+        }
+
+        .record-status.warning {
+            color: #ff976a;
+        }
+
+        .record-status.danger {
+            color: #ee0a24;
+        }
+
+        .record-value {
+            font-size: 18px;
+            font-weight: 500;
+            margin-right: 12px;
+        }
+
+        .record-value.normal {
+            color: #07c160;
+        }
+
+        .record-value.danger {
+            color: #ee0a24;
+        }
+
+        .expand-icon {
+            color: #969799;
+            transition: transform 0.3s;
+        }
+
+        .record-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .record-details {
+            display: none;
+            padding: 0 16px 16px;
+            border-top: 1px solid #ebedf0;
+        }
+
+        .record-card.expanded .record-details {
+            display: block;
+        }
+
+        .detail-tabs {
+            display: flex;
+            margin-bottom: 16px;
+            background: #f7f8fa;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .detail-tab {
+            flex: 1;
+            padding: 8px 16px;
+            text-align: center;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #646566;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .detail-tab.active {
+            background: white;
+            color: #1989fa;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .detail-content {
+            display: none;
+        }
+
+        .detail-content.active {
+            display: block;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: #646566;
+        }
+
+        .detail-value {
+            color: #323233;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            margin: 12px 0;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #1989fa;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1c7cd6;
+        }
+
+        .btn-danger {
+            background: #ee0a24;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d60021;
+        }
+
+        .btn-secondary {
+            background: #f7f8fa;
+            color: #646566;
+            border: 1px solid #ebedf0;
+        }
+
+        .btn-secondary:hover {
+            background: #ebedf0;
+        }
+
+        /* 个人中心页面 */
+        .profile-container {
+            padding-bottom: 60px;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #1989fa, #1890ff);
+            padding: 20px 16px 40px;
+            color: white;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 12px;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .profile-id {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .profile-content {
+            padding: 0 16px;
+            margin-top: -20px;
+        }
+
+        .profile-stats {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 500;
+            color: #323233;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #646566;
+        }
+
+        .menu-section {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .menu-item {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid #ebedf0;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item:hover {
+            background: #f7f8fa;
+        }
+
+        .menu-icon {
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+            color: #1989fa;
+        }
+
+        .menu-text {
+            flex: 1;
+            color: #323233;
+            font-size: 14px;
+        }
+
+        .menu-arrow {
+            color: #969799;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 375px) {
+            .phone-container {
+                margin: 0;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            
+            .bottom-nav {
+                width: 100%;
+            }
+        }
+
+        /* 加载动画 */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1989fa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 0 20px;
+            text-align: center;
+            max-width: 280px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            color: #323233;
+        }
+
+        .modal-text {
+            font-size: 14px;
+            color: #646566;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-header">
+            苍河酒精检测系统
+        </div>
+
+        <!-- 首页 -->
+        <div class="page active" id="home-page">
+            <div class="home-header">
+                <h1>酒精检测</h1>
+                <p>守护安全，从每一次检测开始</p>
+            </div>
+            
+            <div class="home-content">
+                <div class="detection-card">
+                    <button class="start-detection-btn" onclick="startDetection()">
+                        <i class="fas fa-flask"></i>
+                        开始检测
+                    </button>
+                    <p style="color: #646566; font-size: 14px;">点击开始酒精浓度检测</p>
+                </div>
+
+                <div class="info-cards">
+                    <div class="info-card warning" onclick="showRecords()">
+                        <div class="icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="title">异常提醒</div>
+                        <div class="value">3条</div>
+                        <div class="desc">需要复检</div>
+                    </div>
+                    
+                    <div class="info-card normal" onclick="showRecords()">
+                        <div class="icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="title">最近检测</div>
+                        <div class="value">0.00mg/L</div>
+                        <div class="desc">2024-01-15 14:30</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 检测页面 -->
+        <div class="page" id="detection-page">
+            <div class="navbar">
+                <i class="fas fa-arrow-left back-btn" onclick="goBack()"></i>
+                <div class="title">酒精检测</div>
+            </div>
+            
+            <div class="detection-container">
+                <div class="detection-status">
+                    <div class="detection-animation preparing" id="detection-animation">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="detection-text">
+                        <h2 id="detection-title">准备检测</h2>
+                        <p id="detection-desc">请将检测设备放置到嘴边，保持正常呼吸</p>
+                    </div>
+                </div>
+
+                <div class="detection-result" id="detection-result" style="display: none;">
+                    <div class="result-item">
+                        <span class="result-label">检测时间</span>
+                        <span class="result-value" id="detection-time">2024-01-15 15:30:25</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">酒精浓度</span>
+                        <span class="result-value success" id="alcohol-level">0.00 mg/L</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">检测状态</span>
+                        <span class="result-value success" id="detection-status-text">正常</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">检测人员</span>
+                        <span class="result-value">张三</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons" id="detection-actions" style="display: none;">
+                    <button class="btn btn-secondary" onclick="goHome()">返回首页</button>
+                    <button class="btn btn-primary" onclick="showRecords()">查看记录</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 检测记录页面 -->
+        <div class="page" id="records-page">
+            <div class="navbar">
+                <i class="fas fa-arrow-left back-btn" onclick="goBack()"></i>
+                <div class="title">检测记录</div>
+            </div>
+
+            <div class="records-container">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索记录...">
+                </div>
+
+                <div class="record-card" onclick="toggleRecord(this)">
+                    <div class="record-header">
+                        <div class="record-info">
+                            <div class="record-time">2024-01-15 15:30</div>
+                            <div class="record-status danger">
+                                <i class="fas fa-exclamation-circle"></i>
+                                异常 - 需要复检
+                            </div>
+                        </div>
+                        <div class="record-value danger">45.2 mg/L</div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="record-details">
+                        <div class="detail-tabs">
+                            <div class="detail-tab active" onclick="switchTab(this, 'first-test')">首检</div>
+                            <div class="detail-tab" onclick="switchTab(this, 'retest')">复检</div>
+                        </div>
+                        <div class="detail-content active" data-tab="first-test">
+                            <div class="detail-item">
+                                <span class="detail-label">检测时间</span>
+                                <span class="detail-value">2024-01-15 15:30:25</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">酒精浓度</span>
+                                <span class="detail-value">45.2 mg/L</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">检测人员</span>
+                                <span class="detail-value">李四</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">检测设备</span>
+                                <span class="detail-value">设备001</span>
+                            </div>
+                            <div class="video-player" onclick="playVideo()">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="detail-content" data-tab="retest">
+                            <p style="text-align: center; color: #969799; padding: 20px;">暂无复检记录</p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-danger" onclick="startRetest()">立即复检</button>
+                            <button class="btn btn-secondary" onclick="shareRecord()">分享记录</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="record-card" onclick="toggleRecord(this)">
+                    <div class="record-header">
+                        <div class="record-info">
+                            <div class="record-time">2024-01-15 14:30</div>
+                            <div class="record-status normal">
+                                <i class="fas fa-check-circle"></i>
+                                正常
+                            </div>
+                        </div>
+                        <div class="record-value normal">0.00 mg/L</div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="record-details">
+                        <div class="detail-tabs">
+                            <div class="detail-tab active" onclick="switchTab(this, 'first-test')">首检</div>
+                            <div class="detail-tab" onclick="switchTab(this, 'retest')">复检</div>
+                        </div>
+                        <div class="detail-content active" data-tab="first-test">
+                            <div class="detail-item">
+                                <span class="detail-label">检测时间</span>
+                                <span class="detail-value">2024-01-15 14:30:15</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">酒精浓度</span>
+                                <span class="detail-value">0.00 mg/L</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">检测人员</span>
+                                <span class="detail-value">张三</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">检测设备</span>
+                                <span class="detail-value">设备002</span>
+                            </div>
+                            <div class="video-player" onclick="playVideo()">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="detail-content" data-tab="retest">
+                            <p style="text-align: center; color: #969799; padding: 20px;">无需复检</p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="shareRecord()">分享记录</button>
+                            <button class="btn btn-secondary" onclick="printRecord()">打印记录</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="record-card" onclick="toggleRecord(this)">
+                    <div class="record-header">
+                        <div class="record-info">
+                            <div class="record-time">2024-01-15 13:15</div>
+                            <div class="record-status warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                轻微异常
+                            </div>
+                        </div>
+                        <div class="record-value danger">22.5 mg/L</div>
+                        <i class="fas fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="record-details">
+                        <div class="detail-tabs">
+                            <div class="detail-tab active" onclick="switchTab(this, 'first-test')">首检</div>
+                            <div class="detail-tab" onclick="switchTab(this, 'retest')">复检</div>
+                        </div>
+                        <div class="detail-content active" data-tab="first-test">
+                            <div class="detail-item">
+                                <span class="detail-label">检测时间</span>
+                                <span class="detail-value">2024-01-15 13:15:30</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">酒精浓度</span>
+                                <span class="detail-value">22.5 mg/L</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">检测人员</span>
+                                <span class="detail-value">王五</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">检测设备</span>
+                                <span class="detail-value">设备001</span>
+                            </div>
+                            <div class="video-player" onclick="playVideo()">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="detail-content" data-tab="retest">
+                            <div class="detail-item">
+                                <span class="detail-label">复检时间</span>
+                                <span class="detail-value">2024-01-15 13:45:20</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">酒精浓度</span>
+                                <span class="detail-value">0.00 mg/L</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">复检状态</span>
+                                <span class="detail-value">正常</span>
+                            </div>
+                            <div class="video-player" onclick="playVideo()">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="shareRecord()">分享记录</button>
+                            <button class="btn btn-secondary" onclick="printRecord()">打印记录</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 个人中心页面 -->
+        <div class="page" id="profile-page">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-name">张三</div>
+                <div class="profile-id">工号：CH001</div>
+            </div>
+
+            <div class="profile-content">
+                <div class="profile-stats">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">总检测次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">3</div>
+                            <div class="stat-label">异常次数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">98.1%</div>
+                            <div class="stat-label">合格率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-item" onclick="showNotification('个人信息')">
+                        <i class="fas fa-user menu-icon"></i>
+                        <span class="menu-text">个人信息</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-item" onclick="showNotification('设备管理')">
+                        <i class="fas fa-cog menu-icon"></i>
+                        <span class="menu-text">设备管理</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-item" onclick="showNotification('数据统计')">
+                        <i class="fas fa-chart-bar menu-icon"></i>
+                        <span class="menu-text">数据统计</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                </div>
+
+                <div class="menu-section">
+                    <div class="menu-item" onclick="showNotification('帮助中心')">
+                        <i class="fas fa-question-circle menu-icon"></i>
+                        <span class="menu-text">帮助中心</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-item" onclick="showNotification('意见反馈')">
+                        <i class="fas fa-comment menu-icon"></i>
+                        <span class="menu-text">意见反馈</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                    <div class="menu-item" onclick="showNotification('关于我们')">
+                        <i class="fas fa-info-circle menu-icon"></i>
+                        <span class="menu-text">关于我们</span>
+                        <i class="fas fa-chevron-right menu-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('home-page', this)">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" onclick="showPage('records-page', this)">
+                <i class="fas fa-list"></i>
+                <span>记录</span>
+            </div>
+            <div class="nav-item" onclick="startDetection()">
+                <i class="fas fa-plus-circle"></i>
+                <span>检测</span>
+            </div>
+            <div class="nav-item" onclick="showPage('profile-page', this)">
+                <i class="fas fa-user"></i>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">提示</div>
+            <div class="modal-text" id="modal-text">这是一个提示信息</div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="closeModal()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vant UI 组件库 JS -->
+    <script src="https://fastly.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    
+    <script>
+        // 页面导航功能
+        let currentPage = 'home-page';
+        let pageHistory = [];
+
+        function showPage(pageId, navItem = null) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // 显示目标页面
+            document.getElementById(pageId).classList.add('active');
+            
+            // 更新导航状态
+            if (navItem) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                navItem.classList.add('active');
+            }
+            
+            // 记录页面历史
+            if (currentPage !== pageId) {
+                pageHistory.push(currentPage);
+                currentPage = pageId;
+            }
+        }
+
+        function goBack() {
+            if (pageHistory.length > 0) {
+                const previousPage = pageHistory.pop();
+                currentPage = previousPage;
+                showPage(previousPage);
+                
+                // 更新底部导航状态
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                
+                if (previousPage === 'home-page') {
+                    navItems[0].classList.add('active');
+                } else if (previousPage === 'records-page') {
+                    navItems[1].classList.add('active');
+                } else if (previousPage === 'profile-page') {
+                    navItems[3].classList.add('active');
+                }
+            }
+        }
+
+        function goHome() {
+            pageHistory = [];
+            currentPage = 'home-page';
+            showPage('home-page');
+            
+            // 更新底部导航状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector('.nav-item').classList.add('active');
+        }
+
+        // 检测功能
+        function startDetection() {
+            showPage('detection-page');
+            
+            const animation = document.getElementById('detection-animation');
+            const title = document.getElementById('detection-title');
+            const desc = document.getElementById('detection-desc');
+            const result = document.getElementById('detection-result');
+            const actions = document.getElementById('detection-actions');
+            
+            // 重置状态
+            result.style.display = 'none';
+            actions.style.display = 'none';
+            
+            // 阶段1：准备检测
+            animation.className = 'detection-animation preparing';
+            animation.innerHTML = '<i class="fas fa-flask"></i>';
+            title.textContent = '准备检测';
+            desc.textContent = '请将检测设备放置到嘴边，保持正常呼吸';
+            
+            setTimeout(() => {
+                // 阶段2：检测中
+                animation.className = 'detection-animation detecting';
+                animation.innerHTML = '<div class="loading-spinner"></div>';
+                title.textContent = '检测中...';
+                desc.textContent = '请保持呼吸，正在分析酒精浓度';
+                
+                setTimeout(() => {
+                    // 阶段3：检测完成
+                    const isNormal = Math.random() > 0.3; // 70%概率正常
+                    
+                    if (isNormal) {
+                        animation.className = 'detection-animation success';
+                        animation.innerHTML = '<i class="fas fa-check"></i>';
+                        title.textContent = '检测完成';
+                        desc.textContent = '检测结果正常，可以安全驾驶';
+                        
+                        document.getElementById('alcohol-level').textContent = '0.00 mg/L';
+                        document.getElementById('alcohol-level').className = 'result-value success';
+                        document.getElementById('detection-status-text').textContent = '正常';
+                        document.getElementById('detection-status-text').className = 'result-value success';
+                    } else {
+                        animation.className = 'detection-animation danger';
+                        animation.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                        title.textContent = '检测异常';
+                        desc.textContent = '检测到酒精超标，请勿驾驶！';
+                        
+                        const level = (Math.random() * 50 + 20).toFixed(1);
+                        document.getElementById('alcohol-level').textContent = level + ' mg/L';
+                        document.getElementById('alcohol-level').className = 'result-value danger';
+                        document.getElementById('detection-status-text').textContent = '异常';
+                        document.getElementById('detection-status-text').className = 'result-value danger';
+                    }
+                    
+                    // 更新检测时间
+                    const now = new Date();
+                    document.getElementById('detection-time').textContent = 
+                        now.getFullYear() + '-' + 
+                        String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                        String(now.getDate()).padStart(2, '0') + ' ' + 
+                        String(now.getHours()).padStart(2, '0') + ':' + 
+                        String(now.getMinutes()).padStart(2, '0') + ':' + 
+                        String(now.getSeconds()).padStart(2, '0');
+                    
+                    // 显示结果和操作按钮
+                    result.style.display = 'block';
+                    actions.style.display = 'flex';
+                }, 3000);
+            }, 2000);
+        }
+
+        // 记录功能
+        function showRecords() {
+            showPage('records-page');
+            
+            // 更新底部导航状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item')[1].classList.add('active');
+        }
+
+        function toggleRecord(card) {
+            card.classList.toggle('expanded');
+        }
+
+        function switchTab(tab, tabName) {
+            const card = tab.closest('.record-card');
+            
+            // 更新标签状态
+            card.querySelectorAll('.detail-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            tab.classList.add('active');
+            
+            // 更新内容显示
+            card.querySelectorAll('.detail-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            card.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        }
+
+        function startRetest() {
+            showNotification('开始复检', '正在启动复检流程...');
+            setTimeout(() => {
+                startDetection();
+            }, 1500);
+        }
+
+        function shareRecord() {
+            showNotification('分享记录', '记录已复制到剪贴板');
+        }
+
+        function printRecord() {
+            showNotification('打印记录', '正在准备打印...');
+        }
+
+        function playVideo() {
+            showNotification('播放视频', '正在加载检测视频...');
+        }
+
+        // 模态框功能
+        function showNotification(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-text').textContent = message;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('苍河酒精检测小程序原型已加载');
+            
+            // 添加一些交互效果
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+            
+            // 搜索功能
+            const searchInput = document.querySelector('.search-bar input');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    console.log('搜索：', e.target.value);
+                    // 这里可以添加搜索逻辑
+                });
+            }
+        });
+    </script>
+</body>
+</html>
