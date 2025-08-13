@@ -1,0 +1,1131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no, email=no, address=no" />
+    <title>仓河酒精检测 - 原型</title>
+    <meta name="description" content="仓河酒精检测小程序交互原型 - 可直接用于前端对接" />
+
+    <!-- Vant 4 / Vue 3 CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-R3mN3wKzqHq+KpM6rN3q0RrE2xWk1rCw8Q1e8Z1oYwq3Y7E0c2Jw7rC9vFJ9ZJx+IxW6F3T9gQmQ3T8C1hP1g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- ECharts & Day.js -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+
+    <style>
+      :root {
+        --app-primary: #2563eb;
+        --app-danger: #ef4444;
+        --app-warning: #f59e0b;
+        --app-success: #22c55e;
+        --app-bg: #f5f6f8;
+        --app-text: #111827;
+      }
+
+      html, body {
+        height: 100%;
+        background: var(--app-bg);
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif;
+        color: var(--app-text);
+      }
+
+      /* Phone frame-like container for desktop preview */
+      .app-viewport {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        background: #fff;
+        min-height: 100vh;
+        box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+        position: relative;
+      }
+
+      .page {
+        padding-bottom: 80px; /* space for tabbar */
+        background: var(--app-bg);
+        min-height: calc(100vh - 50px);
+      }
+
+      .home-hero {
+        background: linear-gradient(180deg, #e8f0ff 0%, #ffffff 100%);
+        padding: 16px 16px 8px 16px;
+      }
+
+      .metric-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+
+      .metric-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .metric-value {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: #eef2ff;
+        color: var(--app-primary);
+      }
+
+      .badge.badge-danger { background: #fee2e2; color: var(--app-danger); }
+      .badge.badge-warning { background: #fef3c7; color: var(--app-warning); }
+      .badge.badge-success { background: #dcfce7; color: var(--app-success); }
+
+      .section {
+        padding: 12px 16px;
+      }
+
+      .section-title {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .record-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+
+      .record-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .record-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .record-value {
+        font-weight: 800;
+        font-size: 20px;
+      }
+
+      .pill {
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: #f3f4f6;
+        color: #111827;
+      }
+
+      .pill.warn { background: #fef3c7; color: #b45309; }
+      .pill.danger { background: #fee2e2; color: #b91c1c; }
+      .pill.ok { background: #dcfce7; color: #166534; }
+
+      .flex-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .flex-col {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .muted { color: #6b7280; }
+
+      .divider { height: 1px; background: #f3f4f6; margin: 8px 0; }
+
+      .ghost-btn {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .fab-detect {
+        position: fixed;
+        right: calc((100vw - 420px) / 2 + 16px);
+        bottom: 80px;
+        z-index: 20;
+      }
+
+      @media (max-width: 480px) {
+        .fab-detect { right: 16px; }
+      }
+
+      /* Video placeholder */
+      .camera-box {
+        background: #0b1220;
+        border-radius: 12px;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #a5b4fc;
+      }
+
+      .step-hint {
+        background: #eff6ff;
+        border: 1px dashed #93c5fd;
+        color: #1e3a8a;
+        padding: 10px 12px;
+        border-radius: 8px;
+      }
+
+      .kv-row { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+
+      .pointer { cursor: pointer; }
+
+      .chart-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 12px;
+        margin: 12px 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+
+      .chart-box { width: 100%; height: 220px; }
+
+      .van-tabbar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .van-nav-bar {
+        max-width: 420px;
+        margin: 0 auto;
+      }
+
+      .sticky-actions {
+        position: sticky;
+        bottom: 64px;
+        display: flex;
+        gap: 8px;
+        background: transparent;
+        padding-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <van-config-provider :theme-vars="themeVars">
+        <div class="app-viewport">
+          <van-nav-bar
+            v-if="!isTabRoute"
+            :title="pageTitle"
+            left-arrow
+            @click-left="goBackFromSubPage"
+          />
+
+          <!-- Home -->
+          <div v-if="route === 'home'" class="page">
+            <div class="home-hero">
+              <van-notice-bar
+                v-if="lastAbnormalRecord"
+                color="#b45309"
+                background="#fef3c7"
+                left-icon="volume-o"
+                :scrollable="false"
+              >
+                上次检测异常：{{ formatDateTime(lastAbnormalRecord.timestamp) }}，数值 {{ lastAbnormalRecord.bac }} mg/100ml。
+                <span class="pointer" style="text-decoration: underline; margin-left: 6px" @click="toRecords">去查看</span>
+              </van-notice-bar>
+
+              <div class="metric-card" style="margin-top: 12px;">
+                <div class="metric-row">
+                  <div>
+                    <div class="muted" style="font-size: 13px;">最近一次检测</div>
+                    <div class="metric-value">
+                      {{ latestRecord ? latestRecord.bac : '--' }}
+                      <span style="font-size: 14px; font-weight: 600; color: #6b7280;"> mg/100ml</span>
+                    </div>
+                    <div class="muted" style="font-size: 12px;">{{ latestRecord ? formatDateTime(latestRecord.timestamp) : '暂无数据' }}</div>
+                  </div>
+                  <div>
+                    <span class="badge" :class="statusBadgeClass(latestRecord)">
+                      <i :class="statusIconClass(latestRecord)"></i>
+                      {{ statusLabel(latestRecord) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="divider"></div>
+                <div class="flex-row">
+                  <van-button type="primary" block round icon="play-circle-o" @click="startDetection">开始检测</van-button>
+                  <van-button plain type="primary" round @click="toRecords">查看记录</van-button>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">快捷入口</div>
+              <div class="flex-row">
+                <div class="ghost-btn pointer" @click="toRecords">
+                  <i class="fa-solid fa-list"></i>
+                  <span>检测记录</span>
+                </div>
+                <div class="ghost-btn pointer" @click="go('stats')">
+                  <i class="fa-solid fa-chart-line"></i>
+                  <span>趋势统计</span>
+                </div>
+                <div class="ghost-btn pointer" @click="go('profile')">
+                  <i class="fa-solid fa-user"></i>
+                  <span>个人中心</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">检测须知</div>
+              <div class="step-hint">
+                检测前请确保：<br/>
+                1) 检测前15分钟内未饮酒或使用含酒精漱口水；2) 处于通风环境；3) 设备已充分校准。
+              </div>
+            </div>
+          </div>
+
+          <!-- Records -->
+          <div v-if="route === 'records'" class="page">
+            <div class="section">
+              <van-search v-model="recordQuery" placeholder="搜索地点/设备/备注" shape="round" />
+              <div style="height: 8px"></div>
+              <van-tabs v-model:active="recordTab" type="card">
+                <van-tab title="全部" name="all" />
+                <van-tab title="正常" name="normal" />
+                <van-tab title="异常" name="abnormal" />
+              </van-tabs>
+            </div>
+
+            <div class="section" v-if="filteredRecords.length === 0">
+              <van-empty description="暂无记录" image="search" />
+            </div>
+
+            <div class="section" v-else>
+              <div v-for="rec in filteredRecords" :key="rec.id" class="record-card">
+                <div class="record-header">
+                  <div class="record-title">
+                    <van-tag :type="rec.status === 'abnormal' ? 'danger' : 'success'" round>
+                      {{ rec.status === 'abnormal' ? '异常' : '正常' }}
+                    </van-tag>
+                    <div class="muted">{{ formatDateTime(rec.timestamp) }}</div>
+                  </div>
+                  <div class="record-value">
+                    {{ rec.bac }}<span style="font-size: 12px; font-weight: 600; color:#6b7280;"> mg/100ml</span>
+                  </div>
+                </div>
+
+                <div class="muted" style="margin-top: 4px; font-size: 12px;">{{ rec.location }} · {{ rec.device }}</div>
+
+                <div class="divider"></div>
+
+                <van-collapse v-model="rec._expanded" accordion>
+                  <van-collapse-item :name="'rec-' + rec.id" title="查看详细">
+                    <template #value>
+                      <span class="pill" :class="statusPillClass(rec)">{{ statusLabel(rec) }}</span>
+                    </template>
+
+                    <div class="flex-col">
+                      <div class="kv-row">
+                        <div class="muted">首检</div>
+                        <div>
+                          <div>
+                            <span style="font-weight: 700;">{{ rec.initial.value }}</span> mg/100ml
+                            <span class="pill" :class="valuePillClass(rec.initial.value)">{{ labelByValue(rec.initial.value) }}</span>
+                          </div>
+                          <div class="muted" style="font-size: 12px;">
+                            {{ formatDateTime(rec.initial.timestamp) }} · 活体 {{ rec.initial.livenessPassed ? '通过' : '未通过' }}
+                          </div>
+                          <div class="flex-row" style="margin-top: 6px;">
+                            <van-button size="small" plain type="primary" icon="video-o" @click="openVideo(rec.id, 'initial')">查看视频</van-button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-if="rec.recheck" class="kv-row">
+                        <div class="muted">复检</div>
+                        <div>
+                          <div>
+                            <span style="font-weight: 700;">{{ rec.recheck.value }}</span> mg/100ml
+                            <span class="pill" :class="valuePillClass(rec.recheck.value)">{{ labelByValue(rec.recheck.value) }}</span>
+                          </div>
+                          <div class="muted" style="font-size: 12px;">
+                            {{ formatDateTime(rec.recheck.timestamp) }} · 活体 {{ rec.recheck.livenessPassed ? '通过' : '未通过' }}
+                          </div>
+                          <div class="flex-row" style="margin-top: 6px;">
+                            <van-button size="small" plain type="primary" icon="video-o" @click="openVideo(rec.id, 'recheck')">查看视频</van-button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else class="kv-row">
+                        <div class="muted">复检</div>
+                        <div>
+                          <div class="muted">暂无复检数据</div>
+                          <div class="flex-row" style="margin-top: 6px;">
+                            <van-button size="small" type="warning" icon="replay" v-if="rec.status==='abnormal'" @click="startRecheck(rec.id)">发起复检</van-button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </van-collapse-item>
+                </van-collapse>
+
+                <div class="flex-row" style="margin-top: 8px;">
+                  <van-button size="small" plain type="primary" @click="toRecordDetail(rec)">查看详情</van-button>
+                  <van-button size="small" type="primary" @click="openVideo(rec.id, rec.recheck ? 'recheck' : 'initial')">播放最新视频</van-button>
+                  <van-button size="small" type="warning" v-if="rec.status==='abnormal' && !rec.recheck" @click="startRecheck(rec.id)">复检</van-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detect (Wizard) -->
+          <div v-if="route === 'detect'" class="page">
+            <div class="section">
+              <van-steps :active="detectStep" active-icon="success" active-color="#2563eb">
+                <van-step>准备</van-step>
+                <van-step>设备</van-step>
+                <van-step>活体</van-step>
+                <van-step>取样</van-step>
+                <van-step>结果</van-step>
+              </van-steps>
+            </div>
+
+            <!-- Step 0: Prepare -->
+            <div v-if="detectStep === 0" class="section">
+              <div class="step-hint">
+                请确认以下事项后开始：
+                <ul style="margin: 6px 0 0 18px; padding: 0;">
+                  <li>近15分钟内未饮酒或使用含酒精产品</li>
+                  <li>处于通风环境，避免二次酒精吸入</li>
+                  <li>设备已校准并连接良好</li>
+                </ul>
+              </div>
+              <div style="height: 8px"></div>
+              <van-checkbox v-model="consents.noRecentDrink">我承诺近15分钟内未饮酒</van-checkbox>
+              <van-checkbox v-model="consents.camera">我同意打开摄像头用于活体检测</van-checkbox>
+              <div class="sticky-actions">
+                <van-button type="primary" block round :disabled="!canGoNextFromPrepare" @click="nextStep">下一步</van-button>
+              </div>
+            </div>
+
+            <!-- Step 1: Device -->
+            <div v-if="detectStep === 1" class="section">
+              <van-cell-group inset>
+                <van-field label="检测设备" readonly clickable :value="selectedDevice?.name || '选择设备'" @click="showDeviceSheet = true" />
+                <van-field label="连接状态" :value="deviceConnected ? '已连接' : '未连接'" />
+              </van-cell-group>
+              <div style="height: 8px"></div>
+              <van-button type="primary" block round :loading="deviceConnecting" :disabled="!selectedDevice" @click="connectDevice">
+                {{ deviceConnected ? '已连接' : deviceConnecting ? '连接中...' : '连接设备' }}
+              </van-button>
+              <div style="height: 8px"></div>
+              <van-button plain type="primary" block round :disabled="!deviceConnected" @click="calibrateDevice">开始校准</van-button>
+              <div style="height: 8px"></div>
+              <van-progress :percentage="calibrateProgress" pivot-text="校准" color="#2563eb" />
+
+              <div class="sticky-actions">
+                <van-button type="primary" block round :disabled="!deviceConnected || calibrateProgress<100" @click="nextStep">下一步</van-button>
+              </div>
+
+              <van-action-sheet v-model:show="showDeviceSheet" :actions="deviceActions" cancel-text="取消" close-on-popstate @select="onSelectDevice" />
+            </div>
+
+            <!-- Step 2: Liveness -->
+            <div v-if="detectStep === 2" class="section">
+              <div class="camera-box">
+                <div style="text-align:center;">
+                  <i class="fa-solid fa-camera" style="font-size: 28px; opacity: .8;"></i>
+                  <div style="margin-top: 6px;">摄像头预览</div>
+                </div>
+              </div>
+              <div style="height: 10px"></div>
+              <div class="step-hint">
+                请按提示完成活体检测：<br/>
+                1) 点头；2) 左右转头；3) 微笑；4) 读出屏幕四位数字。
+              </div>
+              <div style="height: 8px"></div>
+              <van-button type="primary" block round :loading="livenessRunning" @click="runLiveness">{{ livenessPassed ? '已通过' : livenessRunning ? '检测中...' : '开始活体检测' }}</van-button>
+              <div style="height: 8px"></div>
+              <van-progress :percentage="livenessProgress" pivot-text="活体" color="#22c55e" />
+
+              <div class="sticky-actions">
+                <van-button type="primary" block round :disabled="!livenessPassed" @click="nextStep">下一步</van-button>
+              </div>
+            </div>
+
+            <!-- Step 3: Sampling -->
+            <div v-if="detectStep === 3" class="section">
+              <div class="metric-card" style="text-align: center;">
+                <div class="muted">对准吹嘴，连续吹气直至完成</div>
+                <div style="font-size: 40px; font-weight: 800; margin: 6px 0;">{{ sampleProgress }}%</div>
+                <van-progress :percentage="sampleProgress" color="#2563eb" />
+                <div style="height:10px"></div>
+                <van-button type="primary" round block :loading="sampling" @click="startSampling">{{ sampling ? '取样中...' : '开始取样' }}</van-button>
+              </div>
+              <div style="height: 8px"></div>
+              <div class="step-hint">采样完成后将自动进入结果页面</div>
+            </div>
+
+            <!-- Step 4: Result -->
+            <div v-if="detectStep === 4" class="section">
+              <div class="metric-card">
+                <div class="flex-row" style="align-items: center; justify-content: space-between;">
+                  <div>
+                    <div class="muted">检测结果</div>
+                    <div class="metric-value">{{ detectResult.bac }}<span style="font-size: 14px; font-weight: 600; color: #6b7280;"> mg/100ml</span></div>
+                  </div>
+                  <span class="badge" :class="valueBadgeClass(detectResult.bac)">
+                    {{ labelByValue(detectResult.bac) }}
+                  </span>
+                </div>
+                <div class="divider"></div>
+                <div class="kv-row">
+                  <div class="muted">活体结果</div>
+                  <div>{{ detectResult.livenessPassed ? '通过' : '未通过' }}</div>
+                  <div class="muted">检测时间</div>
+                  <div>{{ formatDateTime(detectResult.timestamp) }}</div>
+                  <div class="muted">检测设备</div>
+                  <div>{{ selectedDevice?.name || '设备A' }}</div>
+                </div>
+                <div class="flex-row" style="margin-top: 10px;">
+                  <van-button type="primary" round @click="saveResultAndToRecords">保存并查看记录</van-button>
+                  <van-button type="warning" round v-if="detectResult.bac >= thresholds.warning" @click="recheckFromResult">复检</van-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video -->
+          <div v-if="route === 'video'" class="page">
+            <div class="section">
+              <div class="metric-card">
+                <div class="muted">检测视频 · {{ videoCtx.stage === 'initial' ? '首检' : '复检' }}</div>
+                <div style="height: 8px"></div>
+                <video controls style="width: 100%; border-radius: 10px; background: #000;" :src="videoSrc"></video>
+                <div style="height: 8px"></div>
+                <div class="flex-row">
+                  <van-button plain type="primary" round @click="toRecords">返回记录</van-button>
+                  <van-button type="warning" round v-if="videoCtx.record && !videoCtx.record.recheck && videoCtx.record.status==='abnormal'" @click="startRecheck(videoCtx.record.id)">发起复检</van-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div v-if="route === 'stats'" class="page">
+            <div class="chart-card">
+              <div class="muted" style="margin-bottom: 6px;">7天趋势</div>
+              <div id="trendChart" class="chart-box"></div>
+            </div>
+            <div class="chart-card">
+              <div class="muted" style="margin-bottom: 6px;">范围分布</div>
+              <div id="distChart" class="chart-box"></div>
+            </div>
+          </div>
+
+          <!-- Profile -->
+          <div v-if="route === 'profile'" class="page">
+            <div class="section">
+              <van-cell-group inset>
+                <van-cell title="头像与昵称" :value="user.name" icon="contact-o" />
+                <van-cell title="部门" value="安全合规部" icon="cluster-o" />
+                <van-cell title="设备绑定" :value="boundDeviceName" is-link icon="scan" @click="go('detect')" />
+              </van-cell-group>
+              <div style="height: 10px"></div>
+              <van-cell-group inset>
+                <van-cell title="消息通知" center>
+                  <template #right-icon>
+                    <van-switch v-model="settings.notify" size="20" />
+                  </template>
+                </van-cell>
+                <van-cell title="隐私模式" center>
+                  <template #right-icon>
+                    <van-switch v-model="settings.privacy" size="20" />
+                  </template>
+                </van-cell>
+              </van-cell-group>
+              <div style="height: 10px"></div>
+              <van-button block type="danger" plain round @click="mockAddAbnormal">快速生成异常记录(演示)</van-button>
+            </div>
+          </div>
+
+          <!-- Bottom Tabbar (main routes) -->
+          <van-tabbar v-model="tabbarIdx" @change="onTabbarChange">
+            <van-tabbar-item icon="home-o">首页</van-tabbar-item>
+            <van-tabbar-item icon="todo-list-o">记录</van-tabbar-item>
+            <van-tabbar-item icon="bar-chart-o">统计</van-tabbar-item>
+            <van-tabbar-item icon="user-o">我的</van-tabbar-item>
+          </van-tabbar>
+
+          <!-- Floating Detect Button -->
+          <div class="fab-detect">
+            <van-floating-bubble axis="xy" icon="play-circle-o" @click="startDetection" />
+          </div>
+        </div>
+      </van-config-provider>
+    </div>
+
+    <script>
+      const { createApp, ref, reactive, computed, watch, onMounted, nextTick } = Vue;
+
+      const app = createApp({
+        setup() {
+          const themeVars = reactive({
+            primaryColor: '#2563eb',
+          });
+
+          // Routing
+          const route = ref('home'); // 'home' | 'records' | 'detect' | 'video' | 'stats' | 'profile'
+          const tabbarIdx = ref(0);
+          const tabRoutes = ['home', 'records', 'stats', 'profile'];
+          const isTabRoute = computed(() => tabRoutes.includes(route.value));
+          const pageTitle = computed(() => {
+            switch (route.value) {
+              case 'home': return '首页';
+              case 'records': return '检测记录';
+              case 'detect': return '开始检测';
+              case 'video': return '检测视频';
+              case 'stats': return '趋势统计';
+              case 'profile': return '个人中心';
+              default: return '';
+            }
+          });
+
+          function onTabbarChange(idx) {
+            tabbarIdx.value = idx;
+            route.value = tabRoutes[idx];
+            if (route.value === 'stats') nextTick(renderCharts);
+          }
+
+          function go(r) {
+            route.value = r;
+            if (isTabRoute.value) tabbarIdx.value = tabRoutes.indexOf(r);
+            if (r === 'stats') nextTick(renderCharts);
+          }
+
+          function toRecords() { go('records'); }
+          function goBackFromSubPage() { go('home'); }
+
+          // Thresholds
+          const thresholds = reactive({ warning: 20, drunk: 80 }); // mg/100ml
+
+          // Sample records
+          const records = ref([
+            seedRecord(1, 8, false, '上海 · 张江园区', '便携设备A'),
+            seedRecord(2, 26, false, '上海 · 张江园区', '便携设备A'),
+            seedRecord(3, 92, true, '上海 · 外滩巡逻点', '执法设备B'),
+            seedRecord(4, 12, false, '苏州 · 园区站', '便携设备A'),
+            seedRecord(5, 68, false, '杭州 · 钱塘新区', '车载设备C'),
+          ]);
+
+          function seedRecord(id, bac, abnormal, location, device) {
+            const ts = Date.now() - Math.floor(Math.random() * 86400 * 1000 * 7);
+            const initial = {
+              value: bac,
+              timestamp: ts,
+              livenessPassed: Math.random() > 0.1,
+              videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+            };
+            const recheck = abnormal ? null : (Math.random() > 0.8 ? {
+              value: Math.max(0, Math.round((bac + (Math.random() * 10 - 5)))),
+              timestamp: ts + 600000,
+              livenessPassed: true,
+              videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+            } : null);
+            return {
+              id,
+              timestamp: ts,
+              bac,
+              status: bac >= thresholds.warning ? 'abnormal' : 'normal',
+              location,
+              device,
+              initial,
+              recheck,
+              _expanded: '',
+            };
+          }
+
+          const recordQuery = ref('');
+          const recordTab = ref('all');
+
+          const filteredRecords = computed(() => {
+            return records.value
+              .filter(r => {
+                if (recordTab.value === 'normal' && r.status !== 'normal') return false;
+                if (recordTab.value === 'abnormal' && r.status !== 'abnormal') return false;
+                if (!recordQuery.value) return true;
+                const q = recordQuery.value.trim();
+                return `${r.location} ${r.device}`.includes(q);
+              })
+              .sort((a,b) => b.timestamp - a.timestamp);
+          });
+
+          const lastAbnormalRecord = computed(() => {
+            return records.value
+              .filter(r => r.status === 'abnormal')
+              .sort((a,b) => b.timestamp - a.timestamp)[0] || null;
+          });
+
+          const latestRecord = computed(() => {
+            return records.value.sort((a,b) => b.timestamp - a.timestamp)[0] || null;
+          });
+
+          function formatDateTime(ts) {
+            try { return dayjs(ts).format('YYYY-MM-DD HH:mm'); } catch(e) { return ''; }
+          }
+
+          function statusLabel(rec) {
+            if (!rec) return '--';
+            return rec.status === 'abnormal' ? (rec.bac >= thresholds.drunk ? '醉驾高风险' : '酒驾风险') : '正常';
+          }
+
+          function statusIconClass(rec) {
+            if (!rec) return 'fa-regular fa-circle';
+            return rec.status === 'abnormal' ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-shield-heart';
+          }
+
+          function statusBadgeClass(rec) {
+            if (!rec) return '';
+            if (rec.status === 'abnormal') {
+              return rec.bac >= thresholds.drunk ? 'badge badge-danger' : 'badge badge-warning';
+            }
+            return 'badge badge-success';
+          }
+
+          function statusPillClass(rec) {
+            if (rec.status === 'abnormal') {
+              return rec.bac >= thresholds.drunk ? 'pill danger' : 'pill warn';
+            }
+            return 'pill ok';
+          }
+
+          function valueBadgeClass(val) {
+            if (val >= thresholds.drunk) return 'badge badge-danger';
+            if (val >= thresholds.warning) return 'badge badge-warning';
+            return 'badge badge-success';
+          }
+
+          function valuePillClass(val) {
+            if (val >= thresholds.drunk) return 'pill danger';
+            if (val >= thresholds.warning) return 'pill warn';
+            return 'pill ok';
+          }
+
+          function labelByValue(val) {
+            if (val >= thresholds.drunk) return '醉驾高风险';
+            if (val >= thresholds.warning) return '酒驾风险';
+            return '正常';
+          }
+
+          // Video view
+          const videoCtx = reactive({ record: null, stage: 'initial' });
+          const videoSrc = computed(() => {
+            if (!videoCtx.record) return '';
+            const target = videoCtx.stage === 'recheck' ? videoCtx.record.recheck : videoCtx.record.initial;
+            return target?.videoUrl || '';
+          });
+
+          function openVideo(id, stage) {
+            const rec = records.value.find(r => r.id === id);
+            videoCtx.record = rec || null;
+            videoCtx.stage = stage || 'initial';
+            route.value = 'video';
+          }
+
+          // Detect wizard state
+          const detectStep = ref(0);
+          const consents = reactive({ noRecentDrink: false, camera: false });
+          const canGoNextFromPrepare = computed(() => consents.noRecentDrink && consents.camera);
+
+          const selectedDevice = ref(null);
+          const deviceConnected = ref(false);
+          const deviceConnecting = ref(false);
+          const showDeviceSheet = ref(false);
+          const calibrateProgress = ref(0);
+
+          const deviceActions = [
+            { name: '便携式酒精检测仪 A', value: 'A' },
+            { name: '执法用酒精检测仪 B', value: 'B' },
+            { name: '车载酒精检测仪 C', value: 'C' },
+          ];
+
+          function onSelectDevice(action, index) {
+            const map = { A: '便携式酒精检测仪 A', B: '执法用酒精检测仪 B', C: '车载酒精检测仪 C' };
+            selectedDevice.value = { name: map[action.value] || action.name };
+          }
+
+          function connectDevice() {
+            deviceConnecting.value = true;
+            setTimeout(() => {
+              deviceConnected.value = true;
+              deviceConnecting.value = false;
+              vant.Toast.success('设备已连接');
+            }, 1000);
+          }
+
+          function calibrateDevice() {
+            calibrateProgress.value = 0;
+            const timer = setInterval(() => {
+              calibrateProgress.value += Math.round(Math.random() * 18 + 5);
+              if (calibrateProgress.value >= 100) {
+                calibrateProgress.value = 100;
+                clearInterval(timer);
+                vant.Toast.success('校准完成');
+              }
+            }, 300);
+          }
+
+          // Liveness
+          const livenessProgress = ref(0);
+          const livenessRunning = ref(false);
+          const livenessPassed = ref(false);
+          function runLiveness() {
+            livenessRunning.value = true;
+            livenessProgress.value = 0;
+            const timer = setInterval(() => {
+              livenessProgress.value += Math.round(Math.random() * 20 + 10);
+              if (livenessProgress.value >= 100) {
+                livenessProgress.value = 100;
+                clearInterval(timer);
+                livenessRunning.value = false;
+                livenessPassed.value = true;
+                vant.Toast.success('活体通过');
+              }
+            }, 300);
+          }
+
+          // Sampling
+          const sampleProgress = ref(0);
+          const sampling = ref(false);
+          function startSampling() {
+            if (sampling.value) return;
+            sampling.value = true;
+            sampleProgress.value = 0;
+            const timer = setInterval(() => {
+              sampleProgress.value += Math.round(Math.random() * 18 + 5);
+              if (sampleProgress.value >= 100) {
+                sampleProgress.value = 100;
+                clearInterval(timer);
+                sampling.value = false;
+                // Auto next with computed result
+                nextStepWithResult();
+              }
+            }, 250);
+          }
+
+          // Detect result
+          const detectResult = reactive({ bac: 0, livenessPassed: true, timestamp: 0, parentId: null });
+
+          function nextStep() {
+            detectStep.value = Math.min(4, detectStep.value + 1);
+          }
+
+          function nextStepWithResult() {
+            // Generate a mock result: if recheck mode, bias towards normal or lower
+            const base = recheckMode.value ? Math.max(0, Math.round((currentInitialValue.value || 20) * (0.4 + Math.random() * 0.6))) : Math.round(Math.random() * 110);
+            detectResult.bac = base;
+            detectResult.livenessPassed = livenessPassed.value;
+            detectResult.timestamp = Date.now();
+            detectStep.value = 4;
+          }
+
+          // Save result
+          function saveResultAndToRecords() {
+            saveDetectResult();
+            vant.Toast.success('已保存');
+            go('records');
+          }
+
+          function saveDetectResult() {
+            if (recheckMode.value && detectResult.parentId) {
+              const parent = records.value.find(r => r.id === detectResult.parentId);
+              if (parent) {
+                parent.recheck = {
+                  value: detectResult.bac,
+                  timestamp: detectResult.timestamp,
+                  livenessPassed: detectResult.livenessPassed,
+                  videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+                };
+                parent.bac = detectResult.bac;
+                parent.status = detectResult.bac >= thresholds.warning ? 'abnormal' : 'normal';
+                parent.timestamp = detectResult.timestamp;
+              }
+              recheckMode.value = false;
+              detectResult.parentId = null;
+            } else {
+              const id = Math.max(0, ...records.value.map(r => r.id)) + 1;
+              records.value.push({
+                id,
+                timestamp: detectResult.timestamp,
+                bac: detectResult.bac,
+                status: detectResult.bac >= thresholds.warning ? 'abnormal' : 'normal',
+                location: '上海 · 张江园区',
+                device: selectedDevice.value?.name || '便携设备A',
+                initial: {
+                  value: detectResult.bac,
+                  timestamp: detectResult.timestamp,
+                  livenessPassed: detectResult.livenessPassed,
+                  videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+                },
+                recheck: null,
+                _expanded: '',
+              });
+            }
+          }
+
+          // Recheck flow
+          const recheckMode = ref(false);
+          const currentInitialValue = ref(null);
+
+          function startRecheck(id) {
+            const rec = records.value.find(r => r.id === id);
+            if (!rec) return;
+            recheckMode.value = true;
+            detectResult.parentId = id;
+            currentInitialValue.value = rec.initial.value;
+            startDetection();
+          }
+
+          function recheckFromResult() {
+            recheckMode.value = true;
+            detectResult.parentId = null; // new record yet, so create after recheck? Here we treat it as recheck of current reading -> create new record then recheck; simplify: direct recheck resets wizard
+            startDetection();
+          }
+
+          // Start detection entry
+          function resetDetectWizard() {
+            detectStep.value = 0;
+            consents.noRecentDrink = false;
+            consents.camera = false;
+            selectedDevice.value = selectedDevice.value || { name: '便携式酒精检测仪 A' };
+            deviceConnected.value = false;
+            deviceConnecting.value = false;
+            showDeviceSheet.value = false;
+            calibrateProgress.value = 0;
+            livenessProgress.value = 0;
+            livenessRunning.value = false;
+            livenessPassed.value = false;
+            sampleProgress.value = 0;
+            sampling.value = false;
+            detectResult.bac = 0;
+            detectResult.livenessPassed = true;
+            detectResult.timestamp = 0;
+          }
+
+          function startDetection() {
+            resetDetectWizard();
+            route.value = 'detect';
+          }
+
+          function toRecordDetail(rec) {
+            // For prototype, expand item and scroll into view
+            route.value = 'records';
+            nextTick(() => {
+              rec._expanded = 'rec-' + rec.id;
+            });
+          }
+
+          const user = reactive({ name: '仓河' });
+          const settings = reactive({ notify: true, privacy: false });
+          const boundDeviceName = computed(() => selectedDevice.value?.name || '未绑定');
+
+          function mockAddAbnormal() {
+            const id = Math.max(0, ...records.value.map(r => r.id)) + 1;
+            const bac = 85;
+            const ts = Date.now();
+            records.value.push({
+              id,
+              timestamp: ts,
+              bac,
+              status: 'abnormal',
+              location: '上海 · 浦东新区',
+              device: selectedDevice.value?.name || '便携设备A',
+              initial: { value: bac, timestamp: ts, livenessPassed: true, videoUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' },
+              recheck: null,
+              _expanded: ''
+            });
+            vant.Toast('已生成一条异常记录');
+          }
+
+          // Charts
+          let trendInst = null;
+          let distInst = null;
+
+          function getTrendData() {
+            const byDay = {};
+            for (let i = 6; i >= 0; i--) {
+              const d = dayjs().subtract(i, 'day').format('MM-DD');
+              byDay[d] = [];
+            }
+            records.value.forEach(r => {
+              const d = dayjs(r.timestamp).format('MM-DD');
+              if (byDay[d]) byDay[d].push(r.bac);
+            });
+            const days = Object.keys(byDay);
+            const vals = days.map(d => {
+              if (byDay[d].length === 0) return 0;
+              return Math.round(byDay[d].reduce((a,b) => a+b, 0) / byDay[d].length);
+            });
+            return { days, vals };
+          }
+
+          function getDistData() {
+            const ranges = [
+              { name: '0-19 正常', min: 0, max: 19 },
+              { name: '20-79 酒驾风险', min: 20, max: 79 },
+              { name: '80+ 醉驾高风险', min: 80, max: 1000 },
+            ];
+            const counts = ranges.map(rg => records.value.filter(r => r.bac >= rg.min && r.bac <= rg.max).length);
+            return { ranges, counts };
+          }
+
+          function renderCharts() {
+            const trendEl = document.getElementById('trendChart');
+            const distEl = document.getElementById('distChart');
+            if (!trendEl || !distEl) return;
+            if (!trendInst) trendInst = echarts.init(trendEl);
+            if (!distInst) distInst = echarts.init(distEl);
+            const t = getTrendData();
+            trendInst.setOption({
+              grid: { left: 30, right: 10, top: 20, bottom: 24 },
+              xAxis: { type: 'category', data: t.days },
+              yAxis: { type: 'value', name: 'mg/100ml' },
+              series: [{ type: 'line', data: t.vals, smooth: true, areaStyle: {} }],
+              tooltip: { trigger: 'axis' },
+            });
+            const d = getDistData();
+            distInst.setOption({
+              grid: { left: 40, right: 10, top: 20, bottom: 24 },
+              xAxis: { type: 'category', data: d.ranges.map(x => x.name) },
+              yAxis: { type: 'value' },
+              series: [{ type: 'bar', data: d.counts, itemStyle: { color: '#2563eb' } }],
+              tooltip: { trigger: 'axis' },
+            });
+          }
+
+          watch(records, () => {
+            if (route.value === 'stats') nextTick(renderCharts);
+          }, { deep: true });
+
+          // Public helpers
+          function startDetectionPublic() { startDetection(); }
+
+          // Navigation helpers
+          function saveAndBackHome() { saveDetectResult(); go('home'); }
+
+          return {
+            themeVars,
+            route,
+            tabbarIdx,
+            onTabbarChange,
+            isTabRoute,
+            pageTitle,
+            go,
+            goBackFromSubPage,
+            toRecords,
+
+            thresholds,
+
+            records,
+            recordQuery,
+            recordTab,
+            filteredRecords,
+            lastAbnormalRecord,
+            latestRecord,
+
+            formatDateTime,
+            statusLabel,
+            statusIconClass,
+            statusBadgeClass,
+            statusPillClass,
+            valueBadgeClass,
+            valuePillClass,
+            labelByValue,
+
+            openVideo,
+            videoCtx,
+            videoSrc,
+
+            detectStep,
+            consents,
+            canGoNextFromPrepare,
+
+            selectedDevice,
+            deviceConnected,
+            deviceConnecting,
+            showDeviceSheet,
+            calibrateProgress,
+            deviceActions,
+            connectDevice,
+            calibrateDevice,
+
+            livenessProgress,
+            livenessRunning,
+            livenessPassed,
+            runLiveness,
+
+            sampleProgress,
+            sampling,
+            startSampling,
+
+            detectResult,
+            nextStep,
+            saveResultAndToRecords,
+            recheckFromResult,
+
+            recheckMode,
+            currentInitialValue,
+            startRecheck,
+
+            startDetection: startDetectionPublic,
+            toRecordDetail,
+
+            user,
+            settings,
+            boundDeviceName,
+            mockAddAbnormal,
+          };
+        },
+      });
+
+      app.use(vant);
+      app.mount('#app');
+    </script>
+  </body>
+</html>
